@@ -1,0 +1,49 @@
+ORIGINAL soldier_search.php TABLE DROP DOWN STRUCTURE 12-12-2017
+
+			<tr>
+				<td><span style="font-weight:bold" >Filter By:</span></td>
+				<td>Rank</td>
+				<td>Occupation</td>
+				<td>Home Location</td>
+				<td>Battles</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>        
+					<select name="rank_id[]" multiple size = "3">
+						<option value="none" selected="selected">None</option>
+			            <option value="0">Select All</option>
+			            <?php foreach ($rank_selection as $rank) : ?>
+			            <option value="<?php echo $rank['id'] ?>"> <?php echo $rank['rank'] ?></option>
+			            <?php endforeach; ?>
+			        </select>
+				</td>
+				<td>
+					 <select name="occupation_id[]" multiple size = "3">
+					 	<option value="none" selected="selected">None</option>
+			            <option value="0">Select All</option>
+			            <?php foreach ($occupation_selection as $occupation) : ?>
+			            <option value="<?php echo $occupation['id'] ?>"> <?php echo $occupation['occupation'] ?></option>
+			            <?php endforeach; ?>
+			        </select>				
+				</td>
+				<td>
+					 <select name="location_id[]" multiple size = "3">
+			            <option value="none" selected="selected">None</option>
+			            <option value="0" hidden="1">Select All</option>
+			            <?php foreach ($location_selection as $location) : ?>
+			            <option value="<?php echo $location['id'] ?>"> <?php echo $location['place'] ?></option>
+			            <?php endforeach; ?>
+			        </select>				
+				</td>
+				<td>
+					 <select name="battle_id[] "multiple size = "3">
+			            <option value="none" selected="selected">None</option>
+			            <option value="0" hidden="1">Select All</option>
+			            <?php foreach ($battle_selection as $battle) : ?>
+			            <option value="<?php echo $battle['id'] ?>"> <?php echo $battle['battle_name'] ?></option>
+			            <?php endforeach; ?>
+			        </select>				
+				</td>
+				
+			</tr>

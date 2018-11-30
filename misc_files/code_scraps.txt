@@ -1,0 +1,51 @@
+function get_soldiers_by_rank($rank_selection_array) {
+    global $db;
+    $num_ranks_seleted = count($rank_selection_array);
+	$select_all = 'false';
+	$constructed_where_clause = "WHERE r.id = ?";
+	$additional_args = " OR r.id = ?";
+	
+	/* uncomment the next line to display the number of selections in the $rank_selection_array */
+	//echo "number of ranks selected from the Rank dropdown list is $num_ranks_seleted";
+	
+	
+	//loop thru the ranks selected in the ranks dropdown to determine if more than on selection was made
+ 	for ($index = 0 ; $index <= $num_ranks_seleted - 1; $index++){
+ 		//if there is more than one selection construct a where clause with additional arguments
+		if($index > 0){
+			$constructed_where_clause = $constructed_where_clause . $additional_args; 
+		}//end if
+			
+		//if any of the returned values equal 0 then Select All option was selected, set $select_all variable to true
+		if($rank_selection_array[$index] == 0){
+			$select_all = 'true';
+		}//end if
+	}//end for
+	
+		//if Select All is selected, cancel where clause in SQL query so all entries will be returned
+		if($select_all == 'true')
+			{$constructed_where_clause = '';
+		}//end if
+	
+    $query = "SELECT s.last_name, s.first_name, s.middle_name, r.rank
+				FROM soldier s
+				JOIN rank r
+				ON s.rank_id = r.id 
+				$constructed_where_clause
+				ORDER BY s.last_name, s.first_name, s.middle_name";	
+				
+	$statement = $db->prepare($query);
+	
+	//if Select All is false loop thru selected values and build where clause
+  	if($select_all == 'false'){
+			for ($index = 1 ; $index <= $num_ranks_seleted ; $index++){
+				$statement->bindValue($index,$rank_selection_array[$index - 1]);
+			}
+		}
+		
+	$statement->execute();
+    $result = $statement->fetchAll();
+	$statement->closeCursor();
+    return $result;
+	
+} // end get_soldiers_by_rank()

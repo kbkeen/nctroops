@@ -1,0 +1,114 @@
+QUERY LISTING NAME, CASUALITY STATUS, BATTLE NAME, BATTLE DATE
+for soldiers captured at Chancellorsville
+
+SELECT s.last_name, s.first_name, s.middle_name, cs.status,  bl.battle_name, bl.battle_date
+FROM soldier as s
+JOIN battle_casualties as bc
+ON s.id = bc.soldier_id
+JOIN battle_list as bl
+ON bc.battle_list_id = bl.id
+JOIN casuality_status as cs
+ON cs.id = bc.casuality_status_id
+WHERE cs.id = 2 and bl.id = 4
+ORDER by s.last_name, s.first_name, bl.date
+
+QUERY TO SELECT SOLDIERS BY RANK
+SELECT s.last_name, s.first_name, s.middle_name, r.rank
+FROM soldier s
+JOIN rank r
+ON s.rank_id = r.id 
+WHERE r.id = 2
+ORDER BY s.last_name, s.first_name, s.middle_name	
+
+QUERY TO SELECT SOLDIERS BY RANK AND OCCUPATION
+SELECT s.last_name, s.first_name, s.middle_name, o.occupation, r.rank
+FROM soldier s
+JOIN occupation o
+ON s.occupation_id = o.id 
+JOIN rank r
+ON s.rank_id = r.id
+WHERE o.id = 2 AND r.id = 3
+ORDER BY s.last_name, s.first_name, s.middle_name
+
+QUERY THAT JOINS SOLDIER, RANK, OCCUPATION, RESIDENCE and BIRTHPLACE
+SELECT s.last_name, s.first_name, s.middle_name, r.rank, o.occupation, 
+birth.place as birthplace, res.place as residence, cs.status, bl.battle_name
+FROM soldier as s
+JOIN rank as r
+ON s.rank_id = r.id
+JOIN occupation as o
+ON s.occupation_id = o.id 
+JOIN location as res
+ON res.id = s.residence_id 
+JOIN location as birth
+ON birth.id = s.birthplace_id 
+JOIN battle_casualties bc
+ON s.id = bc.soldier_id
+JOIN casuality_status cs
+ON bc.casuality_status_id = cs.id
+JOIN battle_list bl
+ON bl.id = bc.battle_list_id
+WHERE bc.casuality_status_id = 2
+ORDER BY r.rank, s.last_name, s.first_name, s.middle_name
+
+WHERE o.id = 2 AND r.id = 3
+ORDER BY s.last_name, s.first_name, s.middle_name
+
+
+
+USING BATTLE CASUALTIES TABLE
+GOOD QUERY 
+
+SELECT s.last_name, s.first_name, s.middle_name
+FROM soldier s
+JOIN battle_casualties bc
+ON s.id = bc.soldier_id
+WHERE bc.battle_list_id = 4
+
+USING BATTLE CASUALTIES AND RANK TABLE
+list all casualities by name and rank for Chancellorsville (bc.battle_list_id = 4)
+
+SELECT s.last_name, s.first_name, s.middle_name, r.rank, cs.status
+FROM soldier s
+JOIN rank r
+ON s.rank_id = r.id
+JOIN battle_casualties bc
+ON s.id = bc.soldier_id
+JOIN casuality_status cs
+ON bc.casuality_status_id = cs.id
+WHERE bc.battle_list_id = 4
+ORDER BY s.last_name, s.first_name, s.middle_name
+
+GOOD QUERY - run it and see what happens 
+
+SELECT s.last_name, s.first_name, s.middle_name, r.rank, cs.status, bl.battle_name
+FROM soldier s
+JOIN rank r
+ON s.rank_id = r.id
+JOIN battle_casualties bc
+ON s.id = bc.soldier_id
+JOIN casuality_status cs
+ON bc.casuality_status_id = cs.id
+JOIN battle_list bl
+ON bl.id = bc.battle_list_id
+WHERE bc.casuality_status_id = 3
+ORDER BY r.rank, s.last_name, s.first_name, s.middle_name
+
+
+QUERY TO SELECT ALL OCUPATIONS TO USE IN DROPDOWN LIST
+
+select id, occupation
+from occupation
+
+QUERY TO SELECT ALL LOCATIONS TO USE IN DROPDOWN LIST
+
+select id, place, state_id
+from location
+
+QUERY TO SELECT ALL STATES TO USE IN DROPDOWN LIST
+
+select id, full_name, abbr
+from state
+
+
+SELECT s.last_name, s.first_name, s.middle_name, r.rank, o.occupation FROM soldier s RIGHT JOIN rank r ON s.rank_id = r.id RIGHT JOIN occupation o ON s.occupation_id = o.id WHERE (r.id = 1 OR r.id = 2) AND (o.id = 1 OR o.id = 2) ORDER BY s.last_name, s.first_name, s.middle_name

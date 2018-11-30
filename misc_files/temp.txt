@@ -1,0 +1,6 @@
+        <select name="rank_id[]" multiple="multiple">
+            <option value="0" selected="selected">Select All</option>
+            <?php foreach ($ranks as $rank) : ?>
+            <option value="<?php echo $rank['id'] ?>"> <?php echo $rank['rank'] ?></option>
+            <?php endforeach; ?>
+        </select>
