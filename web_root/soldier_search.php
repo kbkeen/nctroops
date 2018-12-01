@@ -95,7 +95,7 @@ $casuality_selection = get_casuality_selections ();
 					<tr><td><input type="checkbox" name="dsp_residence" value="TRUE" />Display in report</td></tr>
 					<tr>				
 						<td>
-							 <select name="residence_id[]" size = "3">
+							 <select multiple name="residence_id[]" size = "3">
 					            <option value="none" selected="selected">None</option>
 					            <option value="0">Select All</option>
 					            <?php foreach ($residence_selection as $residence) : ?>

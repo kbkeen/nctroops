@@ -142,20 +142,13 @@ if($no_checkbox_checked == "TRUE" && $no_values_selected == "TRUE"){
 // see web_root/includes/functions.php
 set_checkbox_variables($dsp_rank, $dsp_occupation, $dsp_birthplace, $dsp_residence, $dsp_state, $dsp_battle, $dsp_casuality);
 
+// bulid the $constructed_query based on the users selections
 // see web_root/includes/functions.php
-process_dropdown_list_selections($rank_selection_array, $occupation_selection_array, 
+$constructed_query = process_dropdown_list_selections($rank_selection_array, $occupation_selection_array, 
     $birthplace_selection_array, $residence_selection_array, $state_selection_array, 
     $battle_selection_array, $casuality_selection_array);
 
-// if display in report checkbox is checked add that column of values to the result
-// see web_root/includes/functions.php
-//process_display_checkboxes();
-
-// build the search query based on the users selections
-// see web_root/includes/functions.php
-$constructed_query = construct_query();
-
-// execute query and return result for output display
+// execute the query and return the result for display
 // see require/db_queries.php
 $soldiers = get_soldiers($constructed_query);
 ?>

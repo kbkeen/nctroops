@@ -3,7 +3,6 @@
 global $where_clause;
 global $join_clause;
 global $select_statement;
-global $constructed_query;
 global $cb_rank;
 global $cb_occupation;
 global $cb_birthplace;
@@ -38,7 +37,8 @@ function set_checkbox_variables($dsp_rank, $dsp_occupation, $dsp_birthplace, $ds
 function process_dropdown_list_selections($rank_selection_array, $occupation_selection_array,
     $birthplace_selection_array, $residence_selection_array, $state_selection_array,
     $battle_selection_array, $casuality_selection_array){
-        
+    
+        // define variables
         global $where_clause;
         global $cb_rank;
         global $cb_occupation;
@@ -52,89 +52,99 @@ function process_dropdown_list_selections($rank_selection_array, $occupation_sel
         $residence_selection_join_clause = " LEFT JOIN location res ON s.residence_id = res.id";
         
         
-        // define query WHERE clause ON values
-        $rank_where_clause_on_parameter = "r.id";
-        $occupation_where_clause_on_parameter = "o.id";
-        $birthplace_where_clause_on_parameter = "birth.id";
-        $residence_where_clause_on_parameter = "res.id";
+        // define query WHERE clause values
+        $rank_where_clause_value = "r.id";
+        $occupation_where_clause_value = "o.id";
+        $birthplace_where_clause_value = "birth.id";
+        $residence_where_clause_value = "res.id";
         
         
-        // define the $where_clause_array, used to build the WHERE clause for use in the construct_query() function
+        // define the $where_clause_array, used to build the WHERE clause for the construct_query() function
         $where_clause_array = array();
         
-        /* the process_list_selections() function creates the JOIN clause needed to display that particular 
+        /* the process_list_selections() function creates the JOIN clause needed to display the relevant 
          * column in the report and adds it to the global $join_clause variable for use in the construct_query() function 
+         *
+         * the process_list_selections() function also constructs the WHERE clause values 
+         * and puts them in the $where_clause_array for use in the build_where_clause() function
          */
-        // the process_list_selections() function constructs the where clause values and puts them in the $where_clause_array
         array_push($where_clause_array, process_list_selections($rank_selection_array, 
-            $rank_selection_join_clause, $rank_where_clause_on_parameter, $cb_rank));
+            $rank_selection_join_clause, $rank_where_clause_value, $cb_rank));
+        
         array_push($where_clause_array, process_list_selections($occupation_selection_array,
-            $occupation_selection_join_clause, $occupation_where_clause_on_parameter, $cb_occupation));
+            $occupation_selection_join_clause, $occupation_where_clause_value, $cb_occupation));
+        
         array_push($where_clause_array, process_list_selections($birthplace_selection_array,
-            $birthplace_selection_join_clause, $birthplace_where_clause_on_parameter, $cb_birthplace));
+            $birthplace_selection_join_clause, $birthplace_where_clause_value, $cb_birthplace));
+        
         array_push($where_clause_array, process_list_selections($residence_selection_array,
-            $residence_selection_join_clause, $residence_where_clause_on_parameter, $cb_residence));
+            $residence_selection_join_clause, $residence_where_clause_value, $cb_residence));
         
-        
-        // build the where clause based on values added to the $where_clause_array
-        // place constructed WHERE clause in global $where_clause variable for use in the construct_query() function
-        $where_clause = build_where_clause($where_clause_array);
-        
-        // buid the select statement to be used in the construct_query() function
+        // buid the SELECT statement to be used in the construct_query() function
         build_select_statement();
         
-}//end determine_query_parameters()
+        /* build the WHERE clause based on the values added to the $where_clause_array and
+         * place the constructed WHERE clause in the global $where_clause variable for use in the construct_query() function
+         */
+        $where_clause = build_where_clause($where_clause_array);
+        
+        // build the search query based on the users selections
+        $constructed_query = construct_query();
+        
+        return $constructed_query;
+        
+}//end process_dropdown_list_selections()
 
 //build JOIN and WHERE clauses based on dropdown list selections, add JOIN clause to global $join_clause variable and return WHERE clause
-function process_list_selections($selection_array, $selection_join_clause, $where_clause_on_value, $checkbox_value){
+function process_list_selections($relevant_array, $relevant_join_clause, $relevant_where_clause_value, $checkbox_value){
     
     global $join_clause;
-    $selection_where_clause = "FALSE";
+    $where_clause_values = "FALSE";
     $selection_count = 0;
     
     //build JOIN and WHERE clauses
-    foreach ($selection_array as $selection_value){
+    foreach ($relevant_array as $selected_value){
         $selection_count++;
-        /* if user selected None and the display in report check box is checked 
-         * create a join to the selected table and exit this loop
+        /* if the user selected None and the display in report check box is checked 
+         * create a join to the relevant table and concatenate it to the global join clause
+         * exit this loop
          * None always overrides any additional selections made*/
-        if($selection_value === 'none'){
+        if($selected_value === 'none'){
             if($checkbox_value == "TRUE"){
-                $join_clause = $join_clause . $selection_join_clause;
+                $join_clause .= $relevant_join_clause;
             }
             break;
         }
-        /* if user selected Select All, join the selected table, 
-         * create an empty WHERE clause and exit this loop
+        /* if the user selected Select All, create a join to the relevant table and concatenate it to the global join clause
+         * exit this loop
          * Select All always overrides multiple selections*/
-        elseif($selection_value === '0'){
-            $join_clause = $join_clause . $selection_join_clause;
-            //$rank_where_clause = "FALSE";
+        elseif($selected_value === '0'){
+            $join_clause .= $relevant_join_clause;
             break;
         }
         //else create WHERE clause and JOIN clause to process user selections
         else{
-            //if it's the first selection create a JOIN and WHERE clause for the selected table
+            //if it's the first selection create a JOIN and WHERE clause for the relevant table
             if($selection_count == 1){
-                $join_clause = $join_clause . $selection_join_clause;
-                // "$where_clause_on_value  =  $selection_value" equates to (example r.id = 3)
-                $selection_where_clause =  "$where_clause_on_value  =  $selection_value";
+                $join_clause .= $relevant_join_clause;
+                // EXAMPLE - "$relevant_where_clause_value  =  $selected_value" equates to [r.id = 3]
+                $where_clause_values =  "$relevant_where_clause_value  =  $selected_value";
             }
-            //if there are additional selections, add them to the WHERE clause using the OR keyword
-            //example - " OR  $where_clause_on_value  =  $selection_value" equates to (OR r.id = 3)
+            //if there are additional selections, concatenate them to the WHERE clause using the OR keyword
+            //EXAMPLE - " OR  $relevant_where_clause_value  =  $selected_value" equates to [OR r.id = 3]
             else{
-                $selection_where_clause = $selection_where_clause . " OR  $where_clause_on_value  =  $selection_value";
+                $where_clause_values .= " OR  $relevant_where_clause_value  =  $selected_value";
             }//end inner else
         }// end outer else
     }//end foreach()
     
-    //if where clause value is FALSE return $selection_where_clause defined above (FALSE)
-    //else return where clause values encased in parentheses
-    if($selection_where_clause === "FALSE"){
-        return $selection_where_clause;
+    //if $where_clause_values variable is FALSE as initiated above return FALSE for use in the build_where_clause() function
+    //else return $where_clause_values encased in parentheses
+    if($where_clause_values === "FALSE"){
+        return "FALSE";
     }
     else{
-        return "(" . $selection_where_clause . ")";
+        return "(" . $where_clause_values . ")";
     }
 }//end process_list_selections()
 
@@ -173,7 +183,8 @@ function build_select_statement(){
 
 function build_where_clause($where_clause_array){
     
-    $where_clause = " WHERE ";
+    // define variables
+    $complete_where_clause = " WHERE ";
     $constructed_where_clause = "";
     
     //define a value to count the foreach{} loop iterations to build the WHERE clause
@@ -188,7 +199,7 @@ function build_where_clause($where_clause_array){
         if($value !== "FALSE"){
             ++$where_clause_array_value_count;
             if($where_clause_array_value_count > 1){
-                $constructed_where_clause = $constructed_where_clause . " AND " . $value;
+                $constructed_where_clause .= " AND " . $value;
             }
             else{
                 $constructed_where_clause = $value;
@@ -197,24 +208,28 @@ function build_where_clause($where_clause_array){
     }//end foreach
     
     //build the completed where clause for use in the query
-    $where_clause = $where_clause . $constructed_where_clause;
+    $complete_where_clause .= $constructed_where_clause;
     
-    //if where clause has no values remove it from the query
-    if($where_clause === " WHERE "){
-        $where_clause = "";
+    //if the WHERE clause has no values return an empty string which removes it from the query
+    if($complete_where_clause === " WHERE "){
+        $complete_where_clause = "";
     }
     
-    return $where_clause;
+    return $complete_where_clause;
     
 }//end build_where_clause()
 
 function construct_query(){
-    global $where_clause;
-    global $join_clause;
+    
+    // define variables
     global $select_statement;
-    global $constructed_query;
+    $from_statement = " FROM soldier s";
+    global $join_clause;
+    global $where_clause;
     $order_by_clause = " ORDER BY s.last_name, s.first_name, s.middle_name";
-    $constructed_query = $select_statement . " FROM soldier s" . $join_clause . $where_clause . $order_by_clause;
+    $constructed_query;
+    
+    $constructed_query = $select_statement . $from_statement . $join_clause . $where_clause . $order_by_clause;
     
     // display complete query in solder_search_result.php for testing purposes    
     echo "<br><strong>see -  construct_query() in web_root/includes/functions.php</strong><br>constructed query:<br> $constructed_query";
