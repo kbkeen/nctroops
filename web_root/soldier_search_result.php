@@ -29,14 +29,14 @@ $rank_selection_array = $_POST['rank_id'];
 $occupation_selection_array = $_POST['occupation_id'];
 $birthplace_selection_array = $_POST['birthplace_id'];
 $residence_selection_array = $_POST['residence_id'];
-$state_selection_array = $_POST['state_id'];
+//$state_selection_array = $_POST['state_id'];
 $battle_selection_array = $_POST['battle_id'];
 $casuality_selection_array = $_POST['casuality_id'];
 $dsp_rank;
 $dsp_occupation;
 $dsp_birthplace;
 $dsp_residence;
-$dsp_state;
+//$dsp_state;
 $dsp_battle;
 $dsp_casuality;
 $no_values_selected = FALSE;
@@ -47,8 +47,8 @@ $checkbox_count = 0;
 $cb_values_array = array();
 
 // put all dropdown selections in  - $drop_down_values_array
-$drop_down_values_array = array($rank_selection_array, $occupation_selection_array, $birthplace_selection_array, $residence_selection_array, 
-    $state_selection_array, $battle_selection_array, $casuality_selection_array);
+$drop_down_values_array = array($rank_selection_array, $occupation_selection_array, $birthplace_selection_array, 
+$residence_selection_array, $battle_selection_array, $casuality_selection_array);
 
 
 
@@ -138,15 +138,14 @@ if($no_checkbox_checked == "TRUE" && $no_values_selected == "TRUE"){
 
 // START PROCESSING THE USER SELECTIONS BELOW
 
-// if any chechboxes are checked or any dropdown values othe than None are selected start processing the results
+// if any chechboxes are checked or any dropdown values other than None are selected start processing the results
 // see web_root/includes/functions.php
 set_checkbox_variables($dsp_rank, $dsp_occupation, $dsp_birthplace, $dsp_residence, $dsp_state, $dsp_battle, $dsp_casuality);
 
 // bulid the $constructed_query based on the users selections
 // see web_root/includes/functions.php
 $constructed_query = process_dropdown_list_selections($rank_selection_array, $occupation_selection_array, 
-    $birthplace_selection_array, $residence_selection_array, $state_selection_array, 
-    $battle_selection_array, $casuality_selection_array);
+    $birthplace_selection_array, $residence_selection_array, $battle_selection_array, $casuality_selection_array);
 
 // execute the query and return the result for display
 // see require/db_queries.php
@@ -183,6 +182,12 @@ $soldiers = get_soldiers($constructed_query);
 			if($dsp_residence == "TRUE"){
 			    echo "<th>Residence</th>";
 			}
+			if($dsp_battle == "TRUE"){
+			    echo "<th>Battle</th>";
+			}
+			if($dsp_casuality == "TRUE"){
+			    echo "<th>Casuality</th>";
+			}
 			
 			?>			
         </tr>
@@ -210,6 +215,15 @@ $soldiers = get_soldiers($constructed_query);
 			if($dsp_residence == "TRUE"){
 			    echo "<td>" .  $soldier['residence'] . "</td>";
 			}
+			
+			if($dsp_battle == "TRUE"){
+			    echo "<td>" .  $soldier['battle'] . "</td>";
+			}
+			
+			if($dsp_casuality == "TRUE"){
+			    echo "<td>" .  $soldier['casuality'] . "</td>";
+			}
+			
 			
 			?>			
 			

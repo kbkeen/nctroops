@@ -35,21 +35,27 @@ function set_checkbox_variables($dsp_rank, $dsp_occupation, $dsp_birthplace, $ds
 
 // process selections made by the user
 function process_dropdown_list_selections($rank_selection_array, $occupation_selection_array,
-    $birthplace_selection_array, $residence_selection_array, $state_selection_array,
-    $battle_selection_array, $casuality_selection_array){
+    $birthplace_selection_array, $residence_selection_array, $battle_selection_array, $casuality_selection_array){
     
         // define variables
         global $where_clause;
+        global $join_clause;
         global $cb_rank;
         global $cb_occupation;
         global $cb_birthplace;
         global $cb_residence;
+        global $cb_battle;
+        global $cb_casuality;
+        
         
         // define query JOIN statements
         $rank_selection_join_clause = " LEFT JOIN rank r ON s.rank_id = r.id";
         $occupation_selection_join_clause = " LEFT JOIN occupation o ON s.occupation_id = o.id";
         $birthplace_selection_join_clause = " LEFT JOIN location birth ON s.birthplace_id = birth.id";
         $residence_selection_join_clause = " LEFT JOIN location res ON s.residence_id = res.id";
+        $battle_selection_join_clause = " LEFT JOIN battle_list bl ON  bc.battle_list_id = bl.id";
+        $casuality_selection_join_clause = " LEFT JOIN casuality_status cs ON bc.casuality_status_id = cs.id";
+        $battle_casualties_selection_join_clause = " LEFT JOIN battle_casualties bc ON s.id = bc.soldier_id";
         
         
         // define query WHERE clause values
@@ -57,6 +63,8 @@ function process_dropdown_list_selections($rank_selection_array, $occupation_sel
         $occupation_where_clause_value = "o.id";
         $birthplace_where_clause_value = "birth.id";
         $residence_where_clause_value = "res.id";
+        $battle_where_clause_value = "bl.id";
+        $casuality_where_clause_value = "bc.casuality_status_id";
         
         
         // define the $where_clause_array, used to build the WHERE clause for the construct_query() function
@@ -79,6 +87,21 @@ function process_dropdown_list_selections($rank_selection_array, $occupation_sel
         
         array_push($where_clause_array, process_list_selections($residence_selection_array,
             $residence_selection_join_clause, $residence_where_clause_value, $cb_residence));
+        
+        if($cb_battle == "TRUE" or $cb_casuality == "TRUE"){
+            $join_clause .= $battle_casualties_selection_join_clause;
+        }
+        
+        if($cb_battle == "TRUE"){
+            array_push($where_clause_array, process_list_selections($battle_selection_array,
+                $battle_selection_join_clause, $battle_where_clause_value, $cb_battle));
+        }
+        
+        if($cb_casuality == "TRUE"){
+            array_push($where_clause_array, process_list_selections($casuality_selection_array,
+                $casuality_selection_join_clause, $casuality_where_clause_value, $cb_casuality));
+        }
+        
         
         // buid the SELECT statement to be used in the construct_query() function
         build_select_statement();
@@ -157,6 +180,9 @@ function build_select_statement(){
     global $cb_occupation;
     global $cb_birthplace;
     global $cb_residence;
+    global $cb_battle;
+    global $cb_casuality;
+    
     
     // define select statement, additional values will be added if Display in report checkbox is checked
     $select_statement = "SELECT s.last_name, s.first_name, s.middle_name";
@@ -178,6 +204,15 @@ function build_select_statement(){
     if($cb_residence == "TRUE"){
         $select_statement = $select_statement  . ", res.place as residence";
     }
+    
+    if($cb_battle == "TRUE"){
+        $select_statement = $select_statement  . ", bl.battle_name as battle";
+    }
+    
+    if($cb_casuality == "TRUE"){
+        $select_statement = $select_statement  . ", cs.status as casuality";
+    }
+    
     
 }//end build_select_statement()
 

@@ -90,8 +90,8 @@ ON s.id = bc.soldier_id
 JOIN casuality_status cs
 ON bc.casuality_status_id = cs.id
 JOIN battle_list bl
-ON bl.id = bc.battle_list_id
-WHERE bc.casuality_status_id = 3
+ON bc.battle_list_id = bl.id
+WHERE bc.casuality_status_id = 3 and bl.id = 4
 ORDER BY r.rank, s.last_name, s.first_name, s.middle_name
 
 
