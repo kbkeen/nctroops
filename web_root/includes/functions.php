@@ -267,7 +267,7 @@ function construct_query(){
     $constructed_query = $select_statement . $from_statement . $join_clause . $where_clause . $order_by_clause;
     
     // display complete query in solder_search_result.php for testing purposes    
-    echo "<br><strong>see -  construct_query() in web_root/includes/functions.php</strong><br>constructed query:<br> $constructed_query";
+    //echo "<br><strong>see -  construct_query() in web_root/includes/functions.php</strong><br>constructed query:<br> $constructed_query";
     
     return $constructed_query;
 }//end construct_query()
